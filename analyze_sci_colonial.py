@@ -16,12 +16,14 @@ Needs:
 Outputs (in ./out):
     coldat_name_matches.csv   every colonized COLDAT name and the ISO3 it matched -> CHECK
     regressions.csv           the table
+    regression_table.md       the table formatted for the blog post
     hub_spoke.csv             one row per post-1945 colony
     hub_spoke.png             the figure
     analysis_log.txt          everything printed
 """
 
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -330,14 +332,113 @@ def diff_test(fit, a, b):
         note = "  (covariance unavailable: SE ignores it)"
     z = d / se
     p = 2 * (1 - 0.5 * (1 + math.erf(abs(z) / np.sqrt(2))))
-    return f"{a} - {b} = {d:.3f} (SE {se:.3f}), p = {p:.3f}{note}"
+    return d, se, p, note
 
 
-for name in ["(3) x empire", "(6) (3) + CFA zone", "(7) (3) Africa only"]:
+DIFFS = {}
+for name in fits:
     for a, b in [("col_FRA", "col_GBR"), ("sib45_FRA", "sib45_GBR")]:
         r = diff_test(fits[name], a, b)
         if r:
-            say(f"  {name:<22} {r}")
+            DIFFS[(name, a)] = r
+            if name in ["(3) x empire", "(6) (3) + CFA zone", "(7) (3) Africa only"]:
+                d, se, pv, note = r
+                say(f"  {name:<22} {a} - {b} = {d:.3f} (SE {se:.3f}), p = {pv:.3f}{note}")
+
+
+# ================================================================== 3c. table for the post
+section("3c. Regression table for the post (out/regression_table.md)")
+
+TABLE_COLS = [  # (spec in `specs`, header in the post)
+    ("(1) baseline", "(1) Baseline"),
+    ("(2) +migration", "(2) + Migration"),
+    ("(3) x empire", "(3) By empire"),
+    ("(6) (3) + CFA zone", "(4) + CFA zone"),
+    ("(7) (3) Africa only", "(5) Africa only"),
+    ("(8) time within empire", "(6) Erosion"),
+]
+TABLE_ROWS = [
+    ("**Colonial link**", None),
+    ("Colonial link, any empire", "overseas_colonial"),
+    ("× Britain", "col_GBR"),
+    ("× France", "col_FRA"),
+    ("× Spain", "col_ESP"),
+    ("× other European empires", "col_OTHEREUR"),
+    ("Colonial link × decades since it ended (centered)", "col_x_decades"),
+    ("**Sibling colonies (both independent after 1945)**", None),
+    ("Siblings, any empire", "sibling45"),
+    ("× Britain", "sib45_GBR"),
+    ("× France", "sib45_FRA"),
+    ("× other empires", "sib45_OTHER"),
+    ("Both in the CFA franc zone", "cfa_pair"),
+    ("**Other historical links**", None),
+    ("Settler colony link", "settler_link"),
+    ("Other dependency (e.g. Ottoman, Habsburg)", "other_dependency"),
+    ("Siblings, independent before 1945", "sibling_pre45"),
+    ("**Controls**", None),
+    ("Log distance", "log_dist"),
+    ("Shared border", "contig"),
+    ("Shared official language", "comlang_off"),
+    ("Shared spoken language", "comlang_ethno"),
+    ("Shared religion (index)", "comrelig"),
+    ("Log (1 + migrant stock)", "log1p_mig"),
+    ("Migrant stock zero or missing", "mig_zero"),
+]
+
+
+def cell(t, v):
+    if v not in t.index:
+        return ""
+    b, se, pv = t.loc[v, "Estimate"], t.loc[v, "Std. Error"], t.loc[v, "Pr(>|t|)"]
+    return f"{b:.3f}{stars(pv)} ({se:.3f})"
+
+
+def used_vars(formula):
+    toks = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", formula))
+    return [v for v in toks if v not in ("o", "d")]
+
+
+rows = []
+header = ["", *[h for _, h in TABLE_COLS]]
+rows.append("| " + " | ".join(header) + " |")
+rows.append("|" + "|".join([":---"] + [":---:"] * len(TABLE_COLS)) + "|")
+tidies = {k: fits[k].tidy() for k, _ in TABLE_COLS}
+for label, var in TABLE_ROWS:
+    if var is None:
+        rows.append(f"| {label} |" + " |" * len(TABLE_COLS))
+    else:
+        rows.append(f"| {label} | " + " | ".join(cell(tidies[k], var) for k, _ in TABLE_COLS) + " |")
+
+rows.append(f"| **France − Britain** |" + " |" * len(TABLE_COLS))
+for label, var in [("Colonial link", "col_FRA"), ("Siblings", "sib45_FRA")]:
+    out = []
+    for k, _ in TABLE_COLS:
+        r = DIFFS.get((k, var))
+        out.append("" if r is None else f"{r[0]:.3f} ({r[1]:.3f}) [p = {r[2]:.3f}]")
+    rows.append(f"| {label} | " + " | ".join(out) + " |")
+
+yes = lambda c: "Yes" if c else "No"
+foot = {"Country fixed effects (both sides of the pair)": [], "Sample": [],
+        "Observations (directed)": [], "Country pairs (clusters)": [], "Countries": [],
+        "R²": [], "Within R²": []}
+for k, _ in TABLE_COLS:
+    fit = fits[k]
+    used = [v for v in used_vars(specs[k]) if v in samples[k].columns]
+    est = samples[k].dropna(subset=used)
+    foot["Country fixed effects (both sides of the pair)"].append("Yes")
+    foot["Sample"].append("Africa" if "Africa" in k else "All")
+    foot["Observations (directed)"].append(f"{getattr(fit, '_N', len(est)):,}")
+    foot["Country pairs (clusters)"].append(f"{est.pair_id.nunique():,}")
+    foot["Countries"].append(f"{pd.unique(est[['o', 'd']].values.ravel()).size}")
+    r2, r2w = getattr(fit, "_r2", None), getattr(fit, "_r2_within", None)
+    foot["R²"].append("" if r2 is None else f"{float(r2):.3f}")
+    foot["Within R²"].append("" if r2w is None else f"{float(r2w):.3f}")
+for label, vals in foot.items():
+    rows.append(f"| {label} | " + " | ".join(vals) + " |")
+
+(OUT / "regression_table.md").write_text("\n".join(rows) + "\n", encoding="utf-8")
+say("\n".join(rows))
+say("Saved out/regression_table.md")
 
 
 # ================================================================== 4. hub and spoke

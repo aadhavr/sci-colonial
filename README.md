@@ -27,7 +27,7 @@ Figures use [IBM Plex Sans](https://github.com/IBM/plex). The interactive maps l
 | Script | What it does | Main outputs |
 |---|---|---|
 | `build_sci_colonial.py` | Merges SCI, CEPII Gravity and UN migrant stocks into one row per country pair | `out/pairs.csv`, `out/checkpoint.txt` |
-| `analyze_sci_colonial.py` | Codes colonial links with COLDAT, runs the regressions and the hub-and-spoke comparison. `--mean-dates` runs the robustness check | `out/regressions.csv`, `out/analysis_log.txt`, `out/hub_spoke.csv` |
+| `analyze_sci_colonial.py` | Codes colonial links with COLDAT, runs the regressions and the hub-and-spoke comparison. `--mean-dates` runs the robustness check | `out/regressions.csv`, `out/regression_table.md`, `out/analysis_log.txt`, `out/hub_spoke.csv` |
 | `make_sibling_figure.py` | Static figure of the French and British sibling estimates | `out/sibling_gap.png`, `out/sibling_gap.svg` |
 | `make_maps.py` | Interactive Plotly maps and the hub-and-spoke scatter | `out/maps/*.html` |
 | `style.py` | Shared font and colours | — |
