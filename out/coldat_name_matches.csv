@@ -1,0 +1,128 @@
+coldat_name,iso3,method
+Algeria,DZA,exact
+Angola,AGO,exact
+Antigua & Barbuda,ATG,manual
+Argentina,ARG,exact
+Australia,AUS,exact
+Bahamas,BHS,manual
+Bahrain,BHR,exact
+Bangladesh,BGD,exact
+Barbados,BRB,exact
+Belize,BLZ,exact
+Benin,BEN,exact
+Bhutan,BTN,exact
+Bolivia,BOL,manual
+Botswana,BWA,exact
+Brazil,BRA,exact
+Brunei,BRN,manual
+Burkina Faso,BFA,exact
+Burundi,BDI,exact
+Cambodia,KHM,exact
+Cameroon,CMR,exact
+Canada,CAN,exact
+Cape Verde,CPV,manual
+Central African Republic,CAF,exact
+Chad,TCD,exact
+Chile,CHL,exact
+Colombia,COL,exact
+Comoros,COM,exact
+Congo - Brazzaville,COG,manual
+Congo - Kinshasa,COD,manual
+Costa Rica,CRI,exact
+Cuba,CUB,exact
+Cyprus,CYP,exact
+Côte d’Ivoire,CIV,manual
+Djibouti,DJI,exact
+Dominica,DMA,exact
+Dominican Republic,DOM,exact
+Ecuador,ECU,exact
+Egypt,EGY,manual
+El Salvador,SLV,exact
+Equatorial Guinea,GNQ,exact
+Eritrea,ERI,exact
+Eswatini,SWZ,manual
+Fiji,FJI,exact
+Gabon,GAB,exact
+Gambia,GMB,manual
+Ghana,GHA,exact
+Grenada,GRD,exact
+Guatemala,GTM,exact
+Guinea,GIN,exact
+Guinea-Bissau,GNB,exact
+Guyana,GUY,exact
+Haiti,HTI,exact
+Honduras,HND,exact
+India,IND,exact
+Indonesia,IDN,exact
+Iraq,IRQ,exact
+Israel,ISR,exact
+Jamaica,JAM,exact
+Jordan,JOR,exact
+Kenya,KEN,exact
+Kiribati,KIR,exact
+Kuwait,KWT,exact
+Laos,LAO,manual
+Lebanon,LBN,exact
+Lesotho,LSO,exact
+Libya,LBY,manual
+Madagascar,MDG,exact
+Malawi,MWI,exact
+Malaysia,MYS,exact
+Maldives,MDV,exact
+Mali,MLI,exact
+Marshall Islands,MHL,exact
+Mauritania,MRT,exact
+Mauritius,MUS,exact
+Mexico,MEX,exact
+Micronesia (Federated States of),FSM,manual
+Morocco,MAR,exact
+Mozambique,MOZ,exact
+Myanmar (Burma),MMR,manual
+Namibia,NAM,exact
+Nauru,NRU,exact
+New Zealand,NZL,exact
+Nicaragua,NIC,exact
+Niger,NER,exact
+Nigeria,NGA,exact
+Pakistan,PAK,exact
+Palau,PLW,exact
+Panama,PAN,exact
+Papua New Guinea,PNG,exact
+Paraguay,PRY,exact
+Peru,PER,exact
+Philippines,PHL,exact
+Qatar,QAT,exact
+Rwanda,RWA,exact
+Samoa,WSM,exact
+Senegal,SEN,exact
+Seychelles,SYC,exact
+Sierra Leone,SLE,exact
+Singapore,SGP,exact
+Solomon Islands,SLB,exact
+Somalia,SOM,exact
+South Africa,ZAF,exact
+Sri Lanka,LKA,exact
+St. Kitts & Nevis,KNA,manual
+St. Lucia,LCA,manual
+St. Vincent & Grenadines,VCT,manual
+Sudan,SDN,exact
+Suriname,SUR,exact
+Syria,SYR,manual
+São Tomé & Príncipe,STP,manual
+Tanzania,TZA,manual
+Timor-Leste,TLS,manual
+Togo,TGO,exact
+Tonga,TON,exact
+Trinidad & Tobago,TTO,manual
+Tunisia,TUN,exact
+Tuvalu,TUV,exact
+Uganda,UGA,exact
+United Arab Emirates,ARE,exact
+United States,USA,manual
+Uruguay,URY,exact
+Vanuatu,VUT,exact
+Venezuela,VEN,manual
+Vietnam,VNM,manual
+Yemen,YEM,exact
+Zambia,ZMB,exact
+Zimbabwe,ZWE,exact

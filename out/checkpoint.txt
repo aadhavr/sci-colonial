@@ -1,0 +1,154 @@
+
+======================================================================
+1. SCI
+======================================================================
+Columns: ['user_country', 'friend_country', 'user_region', 'friend_region', 'scaled_sci']
+Rows loaded: 31,684
+Countries in SCI: 178
+
+Presence check:
+  ER: present
+  SS: present
+  XK: present
+  TL: present
+  ME: present
+  PT: present
+  BE: present
+  AO: present
+  MZ: present
+  CD: present
+  NA: present
+
+SCI ISO2 codes with no ISO3 (dropped): none
+Unordered pairs: 15,753
+
+scaled_sci quantiles (watch the bottom; min-max scaling + DP noise):
+  p  0: 1
+  p  1: 60
+  p  5: 137
+  p 10: 215
+  p 25: 472
+  p 50: 1,424
+  p 75: 5,746
+  p 99: 405,099
+  p100: 33,672,295
+  pairs with scaled_sci <= 10: 5
+
+======================================================================
+2. CEPII Gravity
+======================================================================
+Columns not in this version (fine unless it is col_dep_ever/heg_o/heg_d): ['colony', 'smctry']
+Directed rows for 2020: 54,990   duplicate pairs: 0
+
+Ex-colonies/dependencies identified: 179
+  with more than one hegemon: 34  (rule: keep the LAST one by end year)
+  Saved out/metropole_assignment.csv  -> CHECK 10-15 of these by eye
+  (e.g. Namibia may be assigned to South Africa, Cameroon to France or UK)
+
+Agreement between own sibling_pair and CEPII sibling_ever: 93.2%
+
+======================================================================
+3. UN DESA migrant stock
+======================================================================
+Sheets: ['Table of contents', 'Table 1', 'Table 2', 'Table 3', 'Table 4', 'Table 5', 'Table 6', 'Table 7', 'Table 8', 'Table 9', 'Migrant notes']
+Year 2024 found on row 10, column 14 (both sexes block)
+Country-to-country corridors with data: 9,340
+
+======================================================================
+4. Merge
+======================================================================
+SCI pairs with no CEPII match: 177 of 15,753
+  SCI countries never found in CEPII: ['XKX']
+Final pairs: 15,576
+Countries: 177
+Pairs with zero/missing migrant stock: 63.4%
+
+======================================================================
+5. CHECKPOINT: colonial pairs that survive, by empire
+======================================================================
+Colonial pairs in final sample: 153
+
+By metropole (raw):
+colonial_empire
+GBR    54
+FRA    29
+ESP    21
+TUR    10
+DEU     7
+PRT     6
+AUT     4
+JPN     3
+ITA     3
+NLD     3
+USA     2
+BEL     2
+RUS     1
+EGY     1
+DNK     1
+ETH     1
+HTI     1
+SWE     1
+NZL     1
+AUS     1
+ZAF     1
+
+By analysis group:
+colonial_group
+GBR          54
+FRA          29
+OTHER        28
+ESP          21
+OTHER_EUR    21
+
+======================================================================
+5b. Sibling pairs (colony-to-colony, same empire)
+======================================================================
+Sibling pairs: 1758
+
+sibling_empire
+GBR    1275
+FRA     276
+ESP     171
+PRT      15
+TUR      10
+AUT       6
+BEL       1
+ITA       1
+USA       1
+JPN       1
+NLD       1
+
+======================================================================
+5c. Sanity: 15 most connected colonial pairs
+======================================================================
+iso3_a iso3_b colonial_empire  scaled_sci  mig_stock
+   CPV    PRT             PRT     3870760    78116.0
+   PRT    STP             PRT     3319512    23216.0
+   NZL    WSM             NZL     2501474    64239.0
+   GNB    PRT             PRT     1432218    37187.0
+   ERI    ETH             ETH     1222486   176944.0
+   DOM    HTI             HTI      963370   537580.0
+   NLD    SUR             NLD      881453   180939.0
+   AUT    BIH             AUT      481140   180699.0
+   DNK    ISL             DNK      470917    14785.0
+   COM    FRA             FRA      317694   232265.0
+   AUT    SVN             AUT      248495    28859.0
+   AGO    PRT             PRT      214884   207415.0
+   AUT    HRV             AUT      189688    63962.0
+   GBR    VCT             GBR      181656      843.0
+   ESP    PRY             ESP      172675   145896.0
+
+======================================================================
+5d. Sanity: 10 least connected colonial pairs
+======================================================================
+iso3_a iso3_b colonial_empire  scaled_sci  mig_stock
+   DEU    PNG             DEU         199        0.0
+   ESP    FSM             ESP         310        0.0
+   GBR    PNG             GBR         474     1626.0
+   DEU    WSM             DEU         734       32.0
+   FRA    VNM             FRA         834   116008.0
+   GBR    KIR             GBR         860        7.0
+   GBR    SLB             GBR         953       37.0
+   GBR    VUT             GBR        1023      117.0
+   DEU    FSM             DEU        1040        0.0
+   GBR    MMR             GBR        1534        0.0
