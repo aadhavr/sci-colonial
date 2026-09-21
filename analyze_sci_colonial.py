@@ -390,7 +390,11 @@ def cell(t, v):
     if v not in t.index:
         return ""
     b, se, pv = t.loc[v, "Estimate"], t.loc[v, "Std. Error"], t.loc[v, "Pr(>|t|)"]
-    return f"{b:.3f}{stars(pv)} ({se:.3f})"
+    return f"{b:.3f}{stars(pv)}<br>({se:.3f})"   # standard error under the coefficient
+
+
+def fmt_p(pv):
+    return "p < 0.001" if pv < 0.001 else f"p = {pv:.3f}"
 
 
 def used_vars(formula):
@@ -401,7 +405,8 @@ def used_vars(formula):
 rows = []
 header = ["", *[h for _, h in TABLE_COLS]]
 rows.append("| " + " | ".join(header) + " |")
-rows.append("|" + "|".join([":---"] + [":---:"] * len(TABLE_COLS)) + "|")
+# Pandoc sets relative column widths from the dash counts: a wide label column
+rows.append("|" + "|".join([":" + "-" * 34] + [":" + "-" * 11 + ":"] * len(TABLE_COLS)) + "|")
 tidies = {k: fits[k].tidy() for k, _ in TABLE_COLS}
 for label, var in TABLE_ROWS:
     if var is None:
@@ -414,7 +419,7 @@ for label, var in [("Colonial link", "col_FRA"), ("Siblings", "sib45_FRA")]:
     out = []
     for k, _ in TABLE_COLS:
         r = DIFFS.get((k, var))
-        out.append("" if r is None else f"{r[0]:.3f} ({r[1]:.3f}) [p = {r[2]:.3f}]")
+        out.append("" if r is None else f"{r[0]:.3f}<br>({r[1]:.3f})<br>{fmt_p(r[2])}")
     rows.append(f"| {label} | " + " | ".join(out) + " |")
 
 yes = lambda c: "Yes" if c else "No"
