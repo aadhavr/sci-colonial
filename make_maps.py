@@ -33,7 +33,7 @@ import plotly.graph_objects as go
 import pycountry
 
 from style import (DIV, EMP_COL, EMP_NAME, FONT_READY_JS, MUTED, GRID, TEXT,
-                   inject_font, plotly_font)
+                   hoverlabel, inject_font, plotly_font, title_font)
 
 OUT = Path("out")
 MAPS = OUT / "maps"
@@ -56,14 +56,14 @@ GEO = dict(
     resolution=50, bgcolor="rgba(0,0,0,0)",
 )
 LAYOUT = dict(
-    height=580, margin=dict(l=0, r=0, t=70, b=0), paper_bgcolor="white",
+    autosize=True, margin=dict(l=0, r=0, t=44, b=0), paper_bgcolor="white",
     font=plotly_font(13),
-    hoverlabel=dict(font=plotly_font(12)),
+    hoverlabel=hoverlabel(),
 )
 
 
 def title_(text):
-    return dict(text=text, x=0.01, xanchor="left")
+    return dict(text=text, x=0.01, xanchor="left", y=0.985, yanchor="top", font=title_font())
 CONFIG = {"displaylogo": False, "responsive": True,
           "modeBarButtonsToRemove": ["select2d", "lasso2d"]}
 ZOOM = dict(  # second menu on the network and hub maps
@@ -93,7 +93,7 @@ def save(fig, name, post_script=None):
     path = MAPS / name
     scripts = [FONT_READY_JS] + ([post_script] if post_script else [])
     fig.write_html(path, include_plotlyjs="cdn", full_html=True, config=CONFIG,
-                   post_script=scripts)
+                   post_script=scripts, default_width="100%", default_height="100%")
     inject_font(path)
     print("saved", path)
 
@@ -147,15 +147,11 @@ def map_friend_picker(res):
     def view(sel):
         g = by_o[sel]
         z = g.resid.clip(-CLIP, CLIP).round(3).tolist()
-        text = [f"<b>{cname(d)}</b><br>{np.exp(r):.2f}× the friendship predicted"
-                f"<br>by distance, borders, language and religion"
-                for d, r in zip(g.d, g.resid)]
+        text = [f"<b>{cname(d)}</b><br>{np.exp(r):.2f}× predicted" for d, r in zip(g.d, g.resid)]
         return z, g.d.tolist(), text
 
     def title(sel):
-        return (f"Who is {cname(sel)} friends with, beyond what geography predicts?"
-                "<br><sup>Click any country, or pick one from the menu. "
-                "Teal: more friends than predicted. Brown: fewer.</sup>")
+        return f"{cname(sel)}: friendship ties vs. prediction"
 
     z0, l0, t0 = view(DEFAULT_COUNTRY)
     sel_text = lambda c: [f"<b>{cname(c)}</b><br>(selected)"]
@@ -246,9 +242,7 @@ def map_empires(prim, anchors):
     ))
     fig.update_layout(
         **LAYOUT, geo=GEO,
-        title=title_("Which European empire ruled where"
-                     "<br><sup>Last European colonizer, from COLDAT. "
-                     "Click a legend entry to hide or show an empire.</sup>"),
+        title=title_("Last European colonizer"),
         legend=dict(x=0.01, y=0.05, bgcolor="rgba(255,255,255,0.8)"),
     )
     save(fig, "2_empires.html")
@@ -331,13 +325,12 @@ def map_network(res, prim, hs, anchors):
         return out
 
     T = {
-        "both": "Links between former colonies that beat the gravity prediction",
-        "FRA": "Former French colonies: links that beat the gravity prediction",
-        "GBR": "Former British colonies: links that beat the gravity prediction",
-        "hub": "Ties from each former colony to Paris or London",
+        "both": "Links between former colonies, above prediction",
+        "FRA": "Former French colonies",
+        "GBR": "Former British colonies",
+        "hub": "Ties to Paris and London",
     }
-    SUB = ("<br><sup>Post-1945 independence. Thicker line: stronger than predicted by "
-           "distance, borders, language and religion.</sup>")
+    SUB = ""
 
     fig = go.Figure(traces)
     for tr, v in zip(fig.data, vis("both")):
@@ -404,8 +397,7 @@ def map_hub_spoke(hs, anchors):
                 owner.append(k)
 
     def title(k):
-        return (f"{METRICS[k][1]}: post-1945 French and British colonies"
-                f"<br><sup>{METRICS[k][2]}. Teal: above prediction. Brown: below.</sup>")
+        return METRICS[k][1]
 
     fig = go.Figure(traces)
     fig.update_layout(
@@ -472,18 +464,16 @@ def figure_hub_scatter(hs):
                 ticktext=[f"{v:g}×" for v in ticks], gridcolor=GRID, zeroline=False,
                 linecolor="#bbbbbb", ticks="outside", tickcolor="#bbbbbb")
     fig.update_layout(
-        height=600, margin=dict(l=70, r=20, t=110, b=60),
+        autosize=True, margin=dict(l=70, r=20, t=80, b=60),
         paper_bgcolor="white", plot_bgcolor="white",
-        font=plotly_font(13), hoverlabel=dict(font=plotly_font(12)),
-        title=title_("Closer to the capital, or to each other?"
-                     "<br><sup>Each dot is a former colony that became independent after 1945. "
-                     "Hover for details. Values do not hold migration constant.</sup>"),
+        font=plotly_font(13), hoverlabel=hoverlabel(),
+        title=title_("Closer to the capital, or to each other?"),
         xaxis=dict(title="Tie to sibling colonies (× predicted)", **axis),
         yaxis=dict(title="Tie to the old capital (× predicted)", **axis),
         legend=dict(orientation="h", x=0, y=1.0, yanchor="bottom", bgcolor="rgba(0,0,0,0)"),
         annotations=[dict(xref="paper", yref="paper", x=0.02, y=0.98, xanchor="left", yanchor="top",
                           showarrow=False, align="left",
-                          text="Above the dashed line: closer to the capital<br>than to sibling colonies",
+                          text="Above the line: closer to the capital",
                           font=dict(color=MUTED, size=11))],
     )
     save(fig, "hub_spoke_scatter.html")

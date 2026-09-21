@@ -41,6 +41,16 @@ def plotly_font(size=13):
     return dict(family=FONT_STACK, size=size, color=TEXT)
 
 
+# Light hover box with dark text (Plotly's default box is dark grey, which made
+# dark text unreadable).
+def hoverlabel():
+    return dict(bgcolor="white", bordercolor="#cfcfcf", font=plotly_font(12), align="left")
+
+
+def title_font():
+    return dict(family=FONT_STACK, size=15, color=TEXT)
+
+
 # Redraw once the web font has loaded, so labels are measured in Plex, not the fallback.
 FONT_READY_JS = """
 var gdf = document.getElementById('{plot_id}');
@@ -56,6 +66,8 @@ def inject_font(html_path):
     s = p.read_text(encoding="utf-8")
     if FONT_LINK not in s:
         s = s.replace("<head>", "<head>" + FONT_LINK, 1)
+        # the figure fills the iframe exactly, so the iframe height sets the figure height
+        s = s.replace("<head>", "<head><style>html,body{height:100%;margin:0;}</style>", 1)
         s = s.replace("<body>", '<body style="margin:0;font-family:' + FONT_STACK.replace("'", "&#39;") + '">', 1)
         p.write_text(s, encoding="utf-8")
 
